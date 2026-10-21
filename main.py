@@ -1,16 +1,17 @@
-import io
+from fastapi import FastAPI, Response
 import qrcode
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+import io
 
 app = FastAPI()
 
+@app.get("/")
+def home():
+    return {"message": "Benvenuto nella QR Code API! Usa /v1/generate?text=tuo_testo"}
 
-@app.get("/v1/qr/generate")
-def generate_qr(text: str):
-  # Genera l'immagine del QR Code in memoria
-  img = qrcode.make(text)
-  buf = io.BytesIO()
-  img.save(buf, format="PNG")
-  buf.seek(0)
-  return StreamingResponse(buf, media_type="image/png")
+@app.get("/v1/generate")
+def generate_qr(text: str = "https://rapidapi.com"):
+    img = qrcode.make(text)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return Response(content=buf.getvalue(), media_type="image/png")
